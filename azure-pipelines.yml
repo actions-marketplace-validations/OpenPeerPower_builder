@@ -1,4 +1,4 @@
-# https://dev.azure.com/home-assistant
+# https://dev.azure.com/openpeerpower
 
 trigger:
   batch: true
@@ -59,13 +59,13 @@ jobs:
   steps:
   - script: sudo docker login -u $(dockerUser) -p $(dockerPassword)
     displayName: 'Docker hub login'
-  - script: sudo docker pull homeassistant/amd64-builder:$(versionBuilder)
+  - script: sudo docker pull openpeerpower/amd64-builder:$(versionBuilder)
     displayName: 'Install Builder'
   - script: |
       sudo docker run --rm --privileged \
         -v ~/.docker:/root/.docker \
         -v /run/docker.sock:/run/docker.sock:rw -v $(pwd):/data:ro \
-        homeassistant/amd64-builder:$(versionBuilder) --generic dev \
+        openpeerpower/amd64-builder:$(versionBuilder) --generic dev \
         --amd64 --armv7 --aarch64 -t /data
     displayName: 'Build DEV'
 
@@ -80,13 +80,13 @@ jobs:
   steps:
   - script: sudo docker login -u $(dockerUser) -p $(dockerPassword)
     displayName: 'Docker hub login'
-  - script: sudo docker pull homeassistant/amd64-builder:$(versionBuilder)
+  - script: sudo docker pull openpeerpower/amd64-builder:$(versionBuilder)
     displayName: 'Install Builder'
   - script: |
       sudo docker run --rm --privileged \
         -v ~/.docker:/root/.docker \
         -v /run/docker.sock:/run/docker.sock:rw -v $(pwd):/data:ro \
-        homeassistant/amd64-builder:$(versionBuilder) \
+        openpeerpower/amd64-builder:$(versionBuilder) \
         --generic $(Build.SourceBranchName) \
         --amd64 --armv7 --aarch64 -t /data
     displayName: 'Build Release'

@@ -1,6 +1,6 @@
 #!/usr/bin/env bashio
 ######################
-# Hass.io Build-env
+# Opp.io Build-env
 ######################
 set -e
 set +u
@@ -54,8 +54,8 @@ declare -A BUILD_MACHINE=(
 
 function print_help() {
     cat << EOF
-Hass.io build-env for ecosystem:
-docker run --rm homeassistant/{arch}-builder:latest [options]
+Opp.io build-env for ecosystem:
+docker run --rm openpeerpower/{arch}-builder:latest [options]
 
 Options:
   -h, --help
@@ -122,7 +122,7 @@ Options:
     --generic <VERSION>
         Build based on the build.json
     --builder-wheels <PYTHON_TAG>
-        Build the wheels builder for Home Assistant.
+        Build the wheels builder for Open Peer Power.
     --base <VERSION>
         Build our base images.
     --base-python <VERSION=ALPINE>
@@ -135,7 +135,7 @@ Options:
         Build our base debian images.
     --homeassisant-landingpage
         Build the landingpage for machines.
-    --homeassistant-machine <VERSION=ALL,X,Y>
+    --openpeerpower-machine <VERSION=ALL,X,Y>
         Build the machine based image for a release.
 EOF
 
@@ -255,14 +255,14 @@ function run_build() {
 
     # do we know the arch of build?
     if [ -n "$build_arch" ]; then
-        docker_cli+=("--label" "io.hass.arch=$build_arch")
+        docker_cli+=("--label" "io.opp.arch=$build_arch")
         docker_cli+=("--build-arg" "BUILD_ARCH=$build_arch")
     fi
 
     # Build image
     bashio::log.info "Run build for $repository/$image:$version"
     docker build --pull -t "$repository/$image:$version" \
-        --label "io.hass.version=$version" \
+        --label "io.opp.version=$version" \
         --build-arg "BUILD_FROM=$build_from" \
         --build-arg "BUILD_VERSION=$version" \
         "${docker_cli[@]}" \
@@ -307,7 +307,7 @@ function run_build() {
 }
 
 
-#### HassIO functions ####
+#### OppIO functions ####
 
 function build_base_image() {
     local build_arch=$1
@@ -318,10 +318,10 @@ function build_base_image() {
     local docker_tags=()
 
     # Set type
-    docker_cli+=("--label" "io.hass.type=base")
-    docker_cli+=("--label" "io.hass.base.version=$RELEASE")
-    docker_cli+=("--label" "io.hass.base.name=alpine")
-    docker_cli+=("--label" "io.hass.base.image=$DOCKER_HUB/$image")
+    docker_cli+=("--label" "io.opp.type=base")
+    docker_cli+=("--label" "io.opp.base.version=$RELEASE")
+    docker_cli+=("--label" "io.opp.base.name=alpine")
+    docker_cli+=("--label" "io.opp.base.image=$DOCKER_HUB/$image")
 
     # Start build
     run_build "$TARGET/$build_arch" "$DOCKER_HUB" "$image" "$VERSION" \
@@ -332,7 +332,7 @@ function build_base_python_image() {
     local build_arch=$1
 
     local image="{arch}-base-python"
-    local build_from="homeassistant/${build_arch}-base:${ALPINE}"
+    local build_from="openpeerpower/${build_arch}-base:${ALPINE}"
     local version="${VERSION}-alpine${ALPINE}"
     local docker_cli=()
     local docker_tags=()
@@ -343,10 +343,10 @@ function build_base_python_image() {
     fi
 
     # Set type
-    docker_cli+=("--label" "io.hass.type=base")
-    docker_cli+=("--label" "io.hass.base.version=$RELEASE")
-    docker_cli+=("--label" "io.hass.base.name=python")
-    docker_cli+=("--label" "io.hass.base.image=$DOCKER_HUB/$image")
+    docker_cli+=("--label" "io.opp.type=base")
+    docker_cli+=("--label" "io.opp.base.version=$RELEASE")
+    docker_cli+=("--label" "io.opp.base.name=python")
+    docker_cli+=("--label" "io.opp.base.image=$DOCKER_HUB/$image")
 
     # Start build
     run_build "$TARGET/$VERSION" "$DOCKER_HUB" "$image" "$version" \
@@ -369,10 +369,10 @@ function build_base_ubuntu_image() {
     fi
 
     # Set type
-    docker_cli+=("--label" "io.hass.type=base")
-    docker_cli+=("--label" "io.hass.base.version=$RELEASE")
-    docker_cli+=("--label" "io.hass.base.name=ubuntu")
-    docker_cli+=("--label" "io.hass.base.image=$DOCKER_HUB/$image")
+    docker_cli+=("--label" "io.opp.type=base")
+    docker_cli+=("--label" "io.opp.base.version=$RELEASE")
+    docker_cli+=("--label" "io.opp.base.name=ubuntu")
+    docker_cli+=("--label" "io.opp.base.image=$DOCKER_HUB/$image")
 
     # Start build
     run_build "$TARGET/$build_arch" "$DOCKER_HUB" "$image" "$VERSION" \
@@ -389,10 +389,10 @@ function build_base_debian_image() {
     local docker_tags=()
 
     # Set type
-    docker_cli+=("--label" "io.hass.type=base")
-    docker_cli+=("--label" "io.hass.base.version=$RELEASE")
-    docker_cli+=("--label" "io.hass.base.name=debian")
-    docker_cli+=("--label" "io.hass.base.image=$DOCKER_HUB/$image")
+    docker_cli+=("--label" "io.opp.type=base")
+    docker_cli+=("--label" "io.opp.base.version=$RELEASE")
+    docker_cli+=("--label" "io.opp.base.name=debian")
+    docker_cli+=("--label" "io.opp.base.image=$DOCKER_HUB/$image")
 
     # Start build
     run_build "$TARGET/$build_arch" "$DOCKER_HUB" "$image" "$VERSION" \
@@ -415,10 +415,10 @@ function build_base_raspbian_image() {
     fi
 
     # Set type
-    docker_cli+=("--label" "io.hass.type=base")
-    docker_cli+=("--label" "io.hass.base.version=$RELEASE")
-    docker_cli+=("--label" "io.hass.base.name=raspbian")
-    docker_cli+=("--label" "io.hass.base.image=$DOCKER_HUB/$image")
+    docker_cli+=("--label" "io.opp.type=base")
+    docker_cli+=("--label" "io.opp.base.version=$RELEASE")
+    docker_cli+=("--label" "io.opp.base.name=raspbian")
+    docker_cli+=("--label" "io.opp.base.image=$DOCKER_HUB/$image")
 
     # Start build
     run_build "$TARGET" "$DOCKER_HUB" "$image" "$VERSION" \
@@ -449,7 +449,7 @@ function build_addon() {
 
     # Set defaults build things
     if [ -z "$build_from" ]; then
-        build_from="homeassistant/${build_arch}-base:latest"
+        build_from="openpeerpower/${build_arch}-base:latest"
     fi
 
     # Additional build args
@@ -481,12 +481,12 @@ function build_addon() {
     fi
 
     # Set additional labels
-    docker_cli+=("--label" "io.hass.name=$name")
-    docker_cli+=("--label" "io.hass.description=$description")
-    docker_cli+=("--label" "io.hass.type=addon")
+    docker_cli+=("--label" "io.opp.name=$name")
+    docker_cli+=("--label" "io.opp.description=$description")
+    docker_cli+=("--label" "io.opp.type=addon")
 
     if [ -n "$url" ]; then
-        docker_cli+=("--label" "io.hass.url=$url")
+        docker_cli+=("--label" "io.opp.url=$url")
     fi
 
     # Start build
@@ -563,17 +563,17 @@ function build_generic() {
 }
 
 
-function build_homeassistant_machine() {
+function build_openpeerpower_machine() {
     local build_machine=$1
 
-    local image="${build_machine}-homeassistant"
+    local image="${build_machine}-openpeerpower"
     local dockerfile="$TARGET/$build_machine"
     local build_from=""
     local docker_cli=()
     local docker_tags=()
 
     # Set labels
-    docker_cli+=("--label" "io.hass.machine=$build_machine")
+    docker_cli+=("--label" "io.opp.machine=$build_machine")
     docker_cli+=("--file" "$dockerfile")
 
     # Add additional tag
@@ -591,18 +591,18 @@ function build_homeassistant_machine() {
 }
 
 
-function build_homeassistant_landingpage() {
+function build_openpeerpower_landingpage() {
     local build_machine=$1
     local build_arch=$2
 
-    local image="${build_machine}-homeassistant"
-    local build_from="homeassistant/${build_arch}-base:latest"
+    local image="${build_machine}-openpeerpower"
+    local build_from="openpeerpower/${build_arch}-base:latest"
     local docker_cli=()
     local docker_tags=()
 
     # Set labels
-    docker_cli+=("--label" "io.hass.machine=$build_machine")
-    docker_cli+=("--label" "io.hass.type=landingpage")
+    docker_cli+=("--label" "io.opp.machine=$build_machine")
+    docker_cli+=("--label" "io.opp.type=landingpage")
 
     # Start build
     run_build "$TARGET" "$DOCKER_HUB" "$image" "$VERSION" \
@@ -615,7 +615,7 @@ function build_wheels() {
 
     local version=""
     local image="{arch}-wheels"
-    local build_from="homeassistant/${build_arch}-base-python:${PYTHON}"
+    local build_from="openpeerpower/${build_arch}-base-python:${PYTHON}"
     local docker_cli=()
     local docker_tags=()
 
@@ -632,7 +632,7 @@ function build_wheels() {
     fi
 
     # Metadata
-    docker_cli+=("--label" "io.hass.type=wheels")
+    docker_cli+=("--label" "io.opp.type=wheels")
 
     # Start build
     run_build "$TARGET" "$DOCKER_HUB" "$image" "$version-${PYTHON}" \
@@ -822,16 +822,16 @@ while [[ $# -gt 0 ]]; do
             VERSION=$2
             shift
             ;;
-        --homeassistant-landingpage)
-            BUILD_TYPE="homeassistant-landingpage"
+        --openpeerpower-landingpage)
+            BUILD_TYPE="openpeerpower-landingpage"
             SELF_CACHE=true
             DOCKER_LATEST=false
             VERSION="landingpage"
             extract_machine_build "$2"
             shift
             ;;
-        --homeassistant-machine)
-            BUILD_TYPE="homeassistant-machine"
+        --openpeerpower-machine)
+            BUILD_TYPE="openpeerpower-machine"
             SELF_CACHE=true
             VERSION="$(echo "$2" | cut -d '=' -f 1)"
             extract_machine_build "$(echo "$2" | cut -d '=' -f 2)"
@@ -852,7 +852,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check if an architecture is available
-if [ "${#BUILD_LIST[@]}" -eq 0 ] && ! [[ "$BUILD_TYPE" =~ ^homeassistant-(machine|landingpage)$ ]]; then
+if [ "${#BUILD_LIST[@]}" -eq 0 ] && ! [[ "$BUILD_TYPE" =~ ^openpeerpower-(machine|landingpage)$ ]]; then
     bashio::exit.nok "You need select an architecture for build!"
 fi
 
@@ -902,7 +902,7 @@ if [ "${#BUILD_LIST[@]}" -ne 0 ]; then
             (build_base_raspbian_image "$arch") &
         elif [ "$BUILD_TYPE" == "builder-wheels" ]; then
             (build_wheels "$arch") &
-        elif [[ "$BUILD_TYPE" =~ ^homeassistant-(machine|landingpage)$ ]]; then
+        elif [[ "$BUILD_TYPE" =~ ^openpeerpower-(machine|landingpage)$ ]]; then
             continue  # Handled in the loop below
         else
             bashio::exit.nok "Invalid build type: $BUILD_TYPE"
@@ -912,14 +912,14 @@ if [ "${#BUILD_LIST[@]}" -ne 0 ]; then
 fi
 
 # Select machine build
-if [[ "$BUILD_TYPE" =~ ^homeassistant-(machine|landingpage)$ ]]; then
+if [[ "$BUILD_TYPE" =~ ^openpeerpower-(machine|landingpage)$ ]]; then
     bashio::log.info "Machine builds: ${!BUILD_MACHINE[*]}"
     for machine in "${!BUILD_MACHINE[@]}"; do
         machine_arch="${BUILD_MACHINE["$machine"]}"
-        if [ "$BUILD_TYPE" == "homeassistant-machine" ]; then
-            (build_homeassistant_machine "$machine") &
-        elif [ "$BUILD_TYPE" == "homeassistant-landingpage" ]; then
-            (build_homeassistant_landingpage "$machine" "$machine_arch") &
+        if [ "$BUILD_TYPE" == "openpeerpower-machine" ]; then
+            (build_openpeerpower_machine "$machine") &
+        elif [ "$BUILD_TYPE" == "openpeerpower-landingpage" ]; then
+            (build_openpeerpower_landingpage "$machine" "$machine_arch") &
         fi
         BUILD_TASKS+=($!)
     done
