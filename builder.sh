@@ -2,6 +2,8 @@
 ######################
 # Opp.io Build-env
 ######################
+
+set -x
 set -e
 set +u
 
@@ -133,7 +135,7 @@ Options:
         Build our base ubuntu images.
     --base-debian <VERSION>
         Build our base debian images.
-    --homeassisant-landingpage
+    --openpeerpower-landingpage
         Build the landingpage for machines.
     --openpeerpower-machine <VERSION=ALL,X,Y>
         Build the machine based image for a release.
@@ -864,7 +866,7 @@ fi
 
 #### Main ####
 
-mkdir -p /data
+sudo -S mkdir -p /data
 
 # Setup docker env
 init_crosscompile
