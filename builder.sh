@@ -866,7 +866,7 @@ fi
 
 #### Main ####
 
-sudo -S mkdir -p /data
+mkdir -p /data
 
 # Setup docker env
 init_crosscompile
