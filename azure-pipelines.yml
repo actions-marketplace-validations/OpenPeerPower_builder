@@ -19,7 +19,7 @@ variables:
   - name: versionShellCheck
     value: 'v0.7.0'
   - name: versionBuilder
-    value: 'dev.1'
+    value: 'dev'
   - group: docker
 
 jobs:
@@ -65,7 +65,7 @@ jobs:
       sudo docker run --rm --privileged \
         -v ~/.docker:/root/.docker \
         -v /run/docker.sock:/run/docker.sock:rw -v $(pwd):/data:ro \
-        openpeerpower/amd64-builder:$(versionBuilder) --generic dev \
+        openpeerpower/amd64-builder:$(versionBuilder) --generic 1.0 \
         --amd64 --armv7 --aarch64 -t /data
     displayName: 'Build DEV'
 
