@@ -164,7 +164,9 @@ function start_docker() {
     starttime="$(date +%s)"
     endtime="$(date +%s)"
     until docker info >/dev/null 2>&1; do
-        if [ $((endtime - starttime)) -le $DOCKER_TIMEOUT ]; then
+        if [ $((endtime - starttime)) -le $DOCKER_TIMEOUT ]; thenk
+
+        
             sleep 1
             endtime=$(date +%s)
         else

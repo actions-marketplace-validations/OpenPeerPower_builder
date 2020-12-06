@@ -19,7 +19,7 @@ variables:
   - name: versionShellCheck
     value: 'v0.7.0'
   - name: versionBuilder
-    value: 'dev.1'
+    value: 'v1.0'
   - group: docker
 
 jobs:
