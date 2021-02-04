@@ -22,7 +22,7 @@ jobs:
 
     - name: Get information
       id: info
-      uses: open-peer-power/actions/helpers/info@master
+      uses: openpeerpower/actions/helpers/info@master
 
   publish:
     name: Publish builder
