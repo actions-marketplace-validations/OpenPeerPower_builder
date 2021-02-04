@@ -1,0 +1,49 @@
+name: 'Open Peer Power builder'
+description: 'Multi-purpose cross-compile docker builder'
+inputs:
+  args:
+    description: 'Arguments passed to the builder'
+    required: true
+    default: '--help'
+runs:
+  using: "composite"
+  steps: 
+    - shell: bash
+      id: version
+      run: |
+        input=$(echo "${{ github.action_path }}" | cut -d"/" -f8 )
+        if [[ "${input}" == "master" ]] || [[ -z "${input}" ]]; then
+          input="latest"
+        fi
+        echo "::set-output name=version::${input}"
+
+    - shell: bash
+      run: docker pull openpeerpower/amd64-builder:${{ steps.version.outputs.version }}
+
+    - shell: bash
+      id: builder
+      run: |
+        builder=$(docker images openpeerpower/amd64-builder:${{ steps.version.outputs.version }} -q)
+        echo "::set-output name=id::$builder"
+
+    - shell: bash
+      id: build
+      run: |
+        docker run --rm --privileged \
+            -v /var/run/docker.sock:/var/run/docker.sock:ro \
+            -v ~/.docker:/root/.docker \
+            -v ${{ github.workspace }}:/data \
+            openpeerpower/amd64-builder:${{ steps.version.outputs.version }} \
+            ${{ inputs.args }}
+
+    - shell: bash
+      id: verify
+      run: |
+        docker images \
+          --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}" \
+          --filter reference="*/*" \
+          --filter reference="*" \
+          --filter since=${{ steps.builder.outputs.id }}
+branding:
+  icon: 'home'  
+  color: 'blue'

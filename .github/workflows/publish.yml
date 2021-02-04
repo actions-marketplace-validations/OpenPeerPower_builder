@@ -22,7 +22,7 @@ jobs:
 
     - name: Get information
       id: info
-      uses: home-assistant/actions/helpers/info@master
+      uses: open-peer-power/actions/helpers/info@master
 
   publish:
     name: Publish builder
@@ -36,7 +36,7 @@ jobs:
     - name: Checkout the repository
       uses: actions/checkout@v2
 
-    - uses: olegtarasov/get-tag@v2
+    - uses: olegtarasov/get-tag@v2.1
       if: github.event_name == 'release'
       name: Set tag envronment variable
 
@@ -47,7 +47,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Publish ${{ matrix.architecture }} builder
-      uses: home-assistant/builder@master
+      uses: open-peer-power/builder@master
       with:
         args: |
           --${{ matrix.architecture }} \
