@@ -30,7 +30,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build the builder
-      uses: open-peer-power/builder@master
+      uses: openpeerpower/builder@master
       with:
         args: |
           --test \

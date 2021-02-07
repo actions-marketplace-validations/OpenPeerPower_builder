@@ -23,7 +23,7 @@ jobs:
     - name: Checkout the repository
       uses: actions/checkout@v2
     - name: Test build
-      uses: open-peer-power/builder@master
+      uses: openpeerpower/builder@master
       with:
         args: |
           --test \
@@ -54,7 +54,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Publish
-      uses: open-peer-power/builder@master
+      uses: openpeerpower/builder@master
       with:
         args: |
           --all \

@@ -47,7 +47,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Publish ${{ matrix.architecture }} builder
-      uses: open-peer-power/builder@master
+      uses: openpeerpower/builder@master
       with:
         args: |
           --${{ matrix.architecture }} \
