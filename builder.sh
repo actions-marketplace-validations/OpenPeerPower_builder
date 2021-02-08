@@ -3,7 +3,6 @@
 # Opp.io Build-env
 ######################
 
-set -x
 set -e
 set +u
 
@@ -21,6 +20,7 @@ DOCKER_PASSWORD=
 DOCKER_LOCAL=false
 CROSSBUILD_CLEANUP=true
 SELF_CACHE=false
+CUSTOM_CACHE_TAG=
 RELEASE_TAG=false
 GIT_REPOSITORY=
 GIT_BRANCH="master"
@@ -37,6 +37,7 @@ BUILD_ERROR=()
 declare -A BUILD_MACHINE=(
                           [intel-nuc]="amd64" \
                           [odroid-c2]="aarch64" \
+                          [odroid-c4]="aarch64" \
                           [odroid-n2]="aarch64" \
                           [odroid-xu]="armv7" \
                           [qemuarm]="armhf" \
@@ -104,6 +105,8 @@ Options:
        Disable cache for the build (from latest).
     --self-cache
        Use same tag as cache tag instead latest.
+    --cache-tag <TAG>
+       Use a custom tag for the build cache.
     -d, --docker-hub <DOCKER_REPOSITORY>
        Set or overwrite the docker repository.
     --docker-hub-check
@@ -240,7 +243,9 @@ function run_build() {
 
     # Init Cache
     if [ "$DOCKER_CACHE" == "true" ]; then
-        if [ "$SELF_CACHE" == "true" ]; then
+        if [ -n "$CUSTOM_CACHE_TAG" ]; then
+            cache_tag="$CUSTOM_CACHE_TAG"
+        elif [ "$SELF_CACHE" == "true" ]; then
             cache_tag="$version"
         fi
 
@@ -301,8 +306,12 @@ function run_build() {
                     bashio::log.info "Upload succeeded on attempt #${j}"
                     break
                 fi
-                bashio::log.warning "Upload failed on attempt #${j}"
-                sleep 30
+                if [[ "${j}" == "3" ]]; then
+                    bashio::exit.nok "Upload failed on attempt #${j}"
+                else
+                    bashio::log.warning "Upload failed on attempt #${j}"
+                    sleep 30
+                fi
             done
         done
     fi
@@ -466,9 +475,15 @@ function build_addon() {
     name="$(jq --raw-output '.name // empty' "$TARGET/config.json" | sed "s/'//g")"
     description="$(jq --raw-output '.description // empty' "$TARGET/config.json" | sed "s/'//g")"
     url="$(jq --raw-output '.url // empty' "$TARGET/config.json")"
-    version="$(jq --raw-output '.version' "$TARGET/config.json")"
     raw_image="$(jq --raw-output '.image // empty' "$TARGET/config.json")"
     mapfile -t supported_arch < <(jq --raw-output '.arch // empty' "$TARGET/config.json")
+    
+    # Read version from config.json when VERSION is not set
+    if [ -n "$VERSION" ]; then
+    	version="$VERSION"
+    else
+    	version="$(jq --raw-output '.version' "$TARGET/config.json")"
+    fi
 
     # Check arch
     if [[ ! ${supported_arch[*]} =~ ${build_arch} ]]; then
@@ -745,6 +760,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --self-cache)
             SELF_CACHE=true
+            ;;
+        --cache-tag)
+            CUSTOM_CACHE_TAG=$2
+            shift
             ;;
         --release-tag)
             RELEASE_TAG=true
