@@ -1,11 +1,11 @@
-name: 'Publish'
+name: "Publish"
 
 on:
   release:
     types: [published]
   push:
     branches:
-      - main
+      - master
 
 env:
   GIT_TAG_NAME: dev
@@ -17,12 +17,12 @@ jobs:
     outputs:
       architectures: ${{ steps.info.outputs.architectures }}
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v2
+      - name: Checkout the repository
+        uses: actions/checkout@v2.3.4
 
-    - name: Get information
-      id: info
-      uses: openpeerpower/actions/helpers/info@main
+      - name: Get information
+        id: info
+        uses: openpeerpower/actions/helpers/info@master
 
   publish:
     name: Publish builder
@@ -33,23 +33,30 @@ jobs:
       matrix:
         architecture: ${{ fromJson(needs.init.outputs.architectures) }}
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v2
+      - name: Checkout the repository
+        uses: actions/checkout@v2.3.4
 
-    - uses: olegtarasov/get-tag@v2.1
-      if: github.event_name == 'release'
-      name: Set tag envronment variable
+      - uses: olegtarasov/get-tag@v2.1
+        if: github.event_name == 'release'
+        name: Set tag envronment variable
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1.10.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Publish ${{ matrix.architecture }} builder
-      uses: openpeerpower/builder@master
-      with:
-        args: |
-          --${{ matrix.architecture }} \
-          --target /data \
-          --generic $GIT_TAG_NAME
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1.10.0
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GIT_USER }}
+          password: ${{ secrets.GIT_TOKEN }}
+
+      - name: Publish ${{ matrix.architecture }} builder
+        uses: ./
+        with:
+          args: |
+            --${{ matrix.architecture }} \
+            --target /data \
+            --generic $GIT_TAG_NAME

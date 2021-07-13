@@ -11,7 +11,7 @@ Use the `with.args` key to pass in arguments to the builder, to see what argumen
 ### Test action example
 
 ```yaml
-name: 'Test'
+name: "Test"
 
 on: [push, pull_request]
 
@@ -20,22 +20,22 @@ jobs:
     name: Test build
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v2
-    - name: Test build
-      uses: openpeerpower/builder@master
-      with:
-        args: |
-          --test \
-          --all \
-          --target /data \
-          --docker-hub userspace-name
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+      - name: Test build
+        uses: openpeerpower/builder@master
+        with:
+          args: |
+            --test \
+            --all \
+            --target addon-folder \
+            --docker-hub user-name-or-space-name
 ```
 
 ### Publish action example
 
 ```yaml
-name: 'Publish'
+name: "Publish"
 
 on:
   release:
@@ -46,122 +46,112 @@ jobs:
     name: Publish
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v2
-    - name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Publish
-      uses: openpeerpower/builder@master
-      with:
-        args: |
-          --all \
-          --target /data \
-          --docker-hub userspace-name
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Publish
+        uses: openpeerpower/builder@master
+        with:
+          args: |
+            --all \
+            --target addon-folder \
+            --docker-hub user-name-or-space-name
 ```
 
 ## Arguments
 
 ```
-Options:
--h, --help
-      Display this help and exit.
+  Options:
+    -h, --help
+        Display this help and exit.
 
-Repository / Data
-  -r, --repository <REPOSITORY>
-      Set git repository to load data from.
-  -b, --branch <BRANCH>
-      Set git branch for repository.
-  -t, --target <PATH_TO_BUILD>
-      Set local folder or path inside repository for build.
+  Repository / Data
+    -r, --repository <REPOSITORY>
+        Set git repository to load data from.
+    -b, --branch <BRANCH>
+        Set git branch for repository.
+    -t, --target <PATH_TO_BUILD>
+        Set local folder or path inside repository for build.
 
-Version/Image handling
-  -v, --version <VERSION>
-      Overwrite version/tag of build.
-  -i, --image <IMAGE_NAME>
-      Overwrite image name of build / support {arch}.
-  --release <VERSION>
-      Additional version information like for base images.
-  --release-tag
-      Use this as main tag.
+  Version/Image handling
+    -v, --version <VERSION>
+        Overwrite version/tag of build.
+    -i, --image <IMAGE_NAME>
+        Overwrite image name of build / support {arch}.
+    --release <VERSION>
+        Additional version information like for base images.
+    --release-tag
+        Use this as main tag.
+    --version-from <VERSION>
+        Use this to set build_from tag if not specified.
 
-Architecture
-  --armhf
-      Build for arm v6.
-  --armv7
-      Build for arm v7.
-  --amd64
-      Build for intel/amd 64bit.
-  --aarch64
-      Build for arm 64bit.
-  --i386
-      Build for intel/amd 32bit.
-  --all
-      Build all architecture.
+  Architecture
+    --armhf
+        Build for arm v6.
+    --armv7
+        Build for arm v7.
+    --amd64
+        Build for intel/amd 64bit.
+    --aarch64
+        Build for arm 64bit.
+    --i386
+        Build for intel/amd 32bit.
+    --all
+        Build all architecture.
 
-Build handling
-  --test
-      Disable push to dockerhub.
-  --no-latest
-      Do not tag images as latest.
-  --no-cache
-      Disable cache for the build (from latest).
-  --self-cache
-      Use same tag as cache tag instead latest.
-  --cache-tag <TAG>
-      Use a custom tag for the build cache.
-  -d, --docker-hub <DOCKER_REPOSITORY>
-      Set or overwrite the docker repository.
-  --docker-hub-check
-      Check if the version already exists before starting the build.
-  --docker-user
-      Username to login into docker with
-  --docker-password
-      Password to login into docker with
-  --no-crossbuild-cleanup
-      Don't cleanup the crosscompile feature (for multiple builds)
+  Build handling
+    --test
+       Disable push to dockerhub.
+    --no-latest
+       Do not tag images as latest.
+    --no-cache
+       Disable cache for the build (from latest).
+    --self-cache
+       Use same tag as cache tag instead latest.
+    --cache-tag <TAG>
+       Use a custom tag for the build cache.
+    -d, --docker-hub <DOCKER_REPOSITORY>
+       Set or overwrite the docker repository.
+    --docker-hub-check
+       Check if the version already exists before starting the build.
+    --docker-user <USER>
+       Username to login into docker with
+    --docker-password <PASSWORD>
+       Password to login into docker with
+    Use the host docker socket if mapped into container:
+       /var/run/docker.sock
 
-  Use the host docker socket if mapped into container:
-      /var/run/docker.sock
-
-Internals:
-  --addon
-      Default on. Run all things for an addon build.
-  --generic <VERSION>
-      Build based on the build.json
-  --builder-wheels <PYTHON_TAG>
-      Build the wheels builder for Open Peer Power.
-  --base <VERSION>
-      Build our base images.
-  --base-python <VERSION=ALPINE>
-      Build our base python images.
-  --base-raspbian <VERSION>
-      Build our base raspbian images.
-  --base-ubuntu <VERSION>
-      Build our base ubuntu images.
-  --base-debian <VERSION>
-      Build our base debian images.
-  --openpeerpower-landingpage
-      Build the landingpage for machines.
-  --openpeerpower-machine <VERSION=ALL,X,Y>
-      Build the machine based image for a release.
+  Internals:
+    --addon
+        Default on. Run all things for an addon build.
+    --generic <VERSION>
+        Build based on the build.json
+    --base <VERSION>
+        Build our base images.
+    --machine <VERSION=ALL,X,Y>
+        Build the machine based image for a release/landingpage.
 ```
 
 ## Local installation
 
 amd64:
+
 ```bash
 docker pull openpeerpower/amd64-builder
 ```
 
 armv7/armhf:
+
 ```bash
 docker pull openpeerpower/armv7-builder
 ```
 
 aarch64:
+
 ```bash
 docker pull openpeerpower/aarch64-builder
 ```

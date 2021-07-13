@@ -1,13 +1,13 @@
-name: 'Open Peer Power builder'
-description: 'Multi-purpose cross-compile docker builder'
+name: "Open Peer Power builder"
+description: "Multi-purpose cross-compile docker builder"
 inputs:
   args:
-    description: 'Arguments passed to the builder'
+    description: "Arguments passed to the builder"
     required: true
-    default: '--help'
+    default: "--help"
 runs:
   using: "composite"
-  steps: 
+  steps:
     - shell: bash
       id: version
       run: |
@@ -18,12 +18,24 @@ runs:
         echo "::set-output name=version::${input}"
 
     - shell: bash
-      run: docker pull openpeerpower/amd64-builder:${{ steps.version.outputs.version }}
+      run: docker pull ghcr.io/openpeerpower/amd64-builder:${{ steps.version.outputs.version }}
+
+    - shell: bash
+      run: |
+        mkdir -p "${{ github.action_path }}/bin"
+        curl -Lo "${{ github.action_path }}/bin/vcn" https://github.com/vchain-us/vcn/releases/download/v0.9.6/vcn-v0.9.6-linux-amd64-static
+        chmod a+x "${{ github.action_path }}/bin/vcn"
+        echo "${{ github.action_path }}/bin" >> $GITHUB_PATH
+
+        if ! "${{ github.action_path }}/bin/vcn" authenticate --org openpeerpower.io --silent docker://ghcr.io/openpeerpower/amd64-builder:${{ steps.version.outputs.version }}; then
+          echo "Invalid signature!"
+          exit 1
+        fi
 
     - shell: bash
       id: builder
       run: |
-        builder=$(docker images openpeerpower/amd64-builder:${{ steps.version.outputs.version }} -q)
+        builder=$(docker images ghcr.io/openpeerpower/amd64-builder:${{ steps.version.outputs.version }} -q)
         echo "::set-output name=id::$builder"
 
     - shell: bash
@@ -33,7 +45,7 @@ runs:
             -v /var/run/docker.sock:/var/run/docker.sock:ro \
             -v ~/.docker:/root/.docker \
             -v ${{ github.workspace }}:/data \
-            openpeerpower/amd64-builder:${{ steps.version.outputs.version }} \
+            ghcr.io/openpeerpower/amd64-builder:${{ steps.version.outputs.version }} \
             ${{ inputs.args }}
 
     - shell: bash
@@ -45,5 +57,5 @@ runs:
           --filter reference="*" \
           --filter since=${{ steps.builder.outputs.id }}
 branding:
-  icon: 'home'  
-  color: 'blue'
+  icon: "home"
+  color: "blue"
