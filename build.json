@@ -8,9 +8,7 @@
     "amd64": "ghcr.io/openpeerpower/amd64-base:3.13",
     "i386": "ghcr.io/openpeerpower/i386-base:3.13"
   },
-  "args": {
-    "VCN_VERSION": "0.9.6"
-  },
+  "args": {},
   "labels": {
     "io.opp.type": "builder",
     "org.opencontainers.image.source": "https://github.com/openpeerpower/builder"
