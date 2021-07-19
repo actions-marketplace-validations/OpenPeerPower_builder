@@ -16,13 +16,7 @@ RUN \
         coreutils \
     && apk add --no-cache --virtual .build-dependencies \
         build-base \
-        go \
-    \
-    else \
-        exit 1; \
-    fi \
-    \
-    && rm -rf /root/go /root/.cache \
+    && rm -rf /root/.cache \
     \
     && apk del .build-dependencies
 
